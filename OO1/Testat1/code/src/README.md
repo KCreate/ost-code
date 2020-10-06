@@ -2,6 +2,12 @@
 ## Leonard Schütz
 ## 06.10.2020
 
+```
+openjdk 14.0.2 2020-07-14
+OpenJDK Runtime Environment AdoptOpenJDK (build 14.0.2+12)
+OpenJDK 64-Bit Server VM AdoptOpenJDK (build 14.0.2+12, mixed mode, sharing)
+```
+
 Beispiel-output via Main Klasse.
 Tests sind in der Test Klasse.
 
