@@ -36,10 +36,10 @@ public class Test {
         expectedSummary += "  Orange : $4.20 ($2.10 each)\n";
         expectedSummary += "  Motorcycle Course : $525.25\n";
 
-        if (!order.format().equals(expectedSummary)) {
-            System.out.println(order.format());
+        if (!order.toString().equals(expectedSummary)) {
+            System.out.println(order);
             System.out.println(expectedSummary);
-            throw new Exception("format returns wrong result");
+            throw new Exception("toString returns wrong result");
         }
     }
 
@@ -81,10 +81,10 @@ public class Test {
         expectedSummary += "    Onion : $18.00 ($1.50 each)\n";
         expectedSummary += "  Motorcycle Course : $525.25\n";
 
-        if (!order.format().equals(expectedSummary)) {
-            System.out.println(order.format());
+        if (!order.toString().equals(expectedSummary)) {
+            System.out.println(order);
             System.out.println(expectedSummary);
-            throw new Exception("format with bundle returns wrong result");
+            throw new Exception("toString with bundle returns wrong result");
         }
     }
 
@@ -119,10 +119,10 @@ public class Test {
         expectedSummary += "      Knife : $0.50 ($0.50 each)\n";
         expectedSummary += "  Motorcycle Course : $525.25\n";
 
-        if (!order.format().equals(expectedSummary)) {
-            System.out.println(order.format());
+        if (!order.toString().equals(expectedSummary)) {
+            System.out.println(order);
             System.out.println(expectedSummary);
-            throw new Exception("format with nested bundle returns wrong result");
+            throw new Exception("toString with nested bundle returns wrong result");
         }
     }
 
@@ -148,7 +148,7 @@ public class Test {
 
         if (caught_exception == null) {
             throw new Exception("Cycle 1 not detected!");
-        } else if (caught_exception.getMessage() != "Cycle detected!") {
+        } else if (!caught_exception.getMessage().equals("Cycle detected!")) {
             throw new Exception("Invalid exception message");
         }
 
@@ -162,7 +162,7 @@ public class Test {
 
         if (caught_exception == null) {
             throw new Exception("Cycle 12not detected!");
-        } else if (caught_exception.getMessage() != "Cycle detected!") {
+        } else if (!caught_exception.getMessage().equals("Cycle detected!")) {
             throw new Exception("Invalid exception message");
         }
     }

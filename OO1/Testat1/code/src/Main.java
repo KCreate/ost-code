@@ -33,6 +33,6 @@ public class Main {
 
         order.addItem(new ServiceItem("Motorcycle Course", 525.25));
 
-        System.out.println(order.format());
+        System.out.println(order);
     }
 }

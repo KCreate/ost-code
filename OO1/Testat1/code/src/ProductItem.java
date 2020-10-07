@@ -25,12 +25,12 @@ public class ProductItem extends Item {
     }
 
     @Override
-    double getPrice() {
+    public double getPrice() {
         return this.amount * this.pricePerUnit;
     }
 
     @Override
-    String format() {
+    public String toString() {
         String formattedPricePerUnit = String.format("%.2f", this.pricePerUnit);
         String formattedTotalPrice = String.format("%.2f", this.getPrice());
         return (this.description + " : $" + formattedTotalPrice + " ($" + formattedPricePerUnit + " each)");

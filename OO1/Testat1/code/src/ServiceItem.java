@@ -16,7 +16,7 @@ public class ServiceItem extends Item {
     }
 
     @Override
-    public String format() {
+    public String toString() {
         String formattedPrice = String.format("%.2f", this.price);
         return this.description + " : $" + formattedPrice;
     }

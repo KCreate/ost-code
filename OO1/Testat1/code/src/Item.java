@@ -1,5 +1,5 @@
 public abstract class Item {
-    protected String description;
+    protected final String description;
 
     public Item(String description) {
         this.description = description;
@@ -9,10 +9,5 @@ public abstract class Item {
         return this.description;
     }
 
-    abstract double getPrice();
-    abstract String format();
-
-    public void print() {
-        System.out.println(this.format());
-    }
+    public abstract double getPrice();
 }

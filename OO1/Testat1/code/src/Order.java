@@ -2,10 +2,10 @@ import java.util.ArrayList;
 import java.lang.StringBuilder;
 
 public class Order {
-    ArrayList<Item> items;
+    protected final ArrayList<Item> items;
 
     public Order() {
-        this.items = new ArrayList<Item>();
+        this.items = new ArrayList<>();
     }
 
     public void addItem(Item item) {
@@ -22,18 +22,17 @@ public class Order {
         return sumPrice;
     }
 
-    public String format() {
+    @Override
+    public String toString() {
         StringBuilder builder = new StringBuilder();
 
-        builder.append("Order ($" + String.format("%.2f", this.getTotalPrice()) + ")\n");
+        builder.append("Order ($");
+        builder.append(String.format("%.2f", this.getTotalPrice()));
+        builder.append(")\n");
         for (Item item : this.items) {
-            builder.append(item.format().indent(2));
+            builder.append(item.toString().indent(2));
         }
 
         return builder.toString();
-    }
-
-    void printItems() {
-        System.out.print(this.format());
     }
 }

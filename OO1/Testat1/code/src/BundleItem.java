@@ -2,17 +2,16 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 
 public class BundleItem extends Item {
-    protected ArrayList<Item> items;
+    protected final ArrayList<Item> items;
 
     // Modifier to apply to total bundle price
     // 0.2 means 20% discount
     // e.g: 100.- before discount becomes 80.- if discount is 0.2 (20%)
     protected double discount;
 
-    BundleItem(String description, double discount) {
+    public BundleItem(String description, double discount) {
         super(description);
-        this.items = new ArrayList<Item>();
-
+        this.items = new ArrayList<>();
         this.setDiscount(discount);
     }
 
@@ -21,10 +20,13 @@ public class BundleItem extends Item {
     }
 
     protected boolean containsReferenceToSelf(BundleItem item) {
-        LinkedList<Item> itemsToCheck = new LinkedList<Item>();
+        LinkedList<Item> itemsToCheck = new LinkedList<>();
         itemsToCheck.add(item);
 
         // Breadth-First-Search
+        // I could've also solved this recursively, but I've decided not to as that
+        // would bring the risk of causing a stack-overflow. My method only has the risk
+        // of simply running out of memory for the itemsToCheck list.
         while (itemsToCheck.size() > 0) {
             Item top = itemsToCheck.poll();
             if (top == this) {
@@ -32,9 +34,7 @@ public class BundleItem extends Item {
             }
 
             if (top instanceof BundleItem) {
-                for (Item bundle_item : ((BundleItem)top).getItems()) {
-                    itemsToCheck.add(bundle_item);
-                }
+                itemsToCheck.addAll(((BundleItem)top).getItems());
             }
         }
 
@@ -74,19 +74,22 @@ public class BundleItem extends Item {
     }
 
     @Override
-    public String format() {
+    public String toString() {
         StringBuilder builder = new StringBuilder();
 
         String formattedTotalPrice = String.format("%.2f", this.getPrice());
         String formattedDiscount = String.format("%.0f", this.getDiscount() * 100);
 
-        builder.append("Bundle : " + this.getDescription() + " : $");
+        builder.append("Bundle : ");
+        builder.append(this.getDescription());
+        builder.append(" : $");
         builder.append(formattedTotalPrice);
-        builder.append(" with " + formattedDiscount + "% discount\n");
+        builder.append(" with ");
+        builder.append(formattedDiscount);
+        builder.append("% discount\n");
 
-        for (int i = 0; i < this.items.size(); i++) {
-            Item item = this.items.get(i);
-            builder.append(item.format().indent(2));
+        for (Item item : this.items) {
+            builder.append(item.toString().indent(2));
         }
 
         return builder.toString();
