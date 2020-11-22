@@ -2,7 +2,7 @@
 -- Leonard Schütz & Adrian Locher
 
 
-/*	A1.1
+/*  A1.1
 *Situation:
 *Wir wollen alle Pizzatypen, welche toppings haben ausgeben.
 */
@@ -15,15 +15,15 @@ SELECT DISTINCT pizza_type from ingredient;
 */
 
 SELECT pers.name, pers.surname, pers.address, "order".date
-	FROM person as pers
-		JOIN customer as cust on cust.person_id = pers.id
-		JOIN "order" on "order".customer = cust.id
-		JOIN order_item as ordit on ordit."order" = "order".id
-		JOIN pizza_type as piztyp on ordit.pizza_type = piztyp.id
-	WHERE piztyp.name = 'Margherita'
-		AND "order".date > '2020-05-01'
-		AND "order".date < '2020-05-30';
-		
+    FROM person as pers
+        JOIN customer as cust on cust.person_id = pers.id
+        JOIN "order" on "order".customer = cust.id
+        JOIN order_item as ordit on ordit."order" = "order".id
+        JOIN pizza_type as piztyp on ordit.pizza_type = piztyp.id
+    WHERE piztyp.name = 'Margherita'
+        AND "order".date > '2020-05-01'
+        AND "order".date < '2020-05-30';
+        
 /* A1.3
 *Situation:
 *Wir wollen wissen, welche Pizzatypen nur vegetarische Toppings haben.
@@ -31,61 +31,61 @@ SELECT pers.name, pers.surname, pers.address, "order".date
 */
 
 SELECT DISTINCT piztyp.name
-	FROM pizza_type as piztyp
-	WHERE piztyp.id NOT IN (
-			SELECT ing.pizza_type FROM ingredient as ing
-				JOIN topping as top ON top.id = ing.topping
-			WHERE top.vegetarian = FALSE
-	);
-		
+    FROM pizza_type as piztyp
+    WHERE piztyp.id NOT IN (
+            SELECT ing.pizza_type FROM ingredient as ing
+                JOIN topping as top ON top.id = ing.topping
+            WHERE top.vegetarian = FALSE
+    );
+        
 /* A1.4
 *Situation:
 *Wir wollen wissen, welche Topping überdurchschnittlich viel kosten.
 */
 
 SELECT top.name, top.price 
-	FROM topping as top
-	WHERE top.price > ANY (
-		SELECT AVG(price) 
-			FROM topping
-	);
-	
+    FROM topping as top
+    WHERE top.price > ANY (
+        SELECT AVG(price) 
+            FROM topping
+    );
+    
 /* A2.1
 *Situation: 
 *Wir wollen wissen, welche Mitarbeiter (delivery-drivers) auch Kunden sind.
 */
 
 SELECT pers.name, pers.surname
-	FROM person as pers
-		JOIN customer as cust on cust.person_id = pers.id
-	WHERE cust.person_id IN (
-		SELECT person_id from delivery_driver
-	);
-	
+    FROM person as pers
+        JOIN customer as cust on cust.person_id = pers.id
+    WHERE cust.person_id IN (
+        SELECT person_id from delivery_driver
+    );
+    
 WITH deldri as (
-	select person_id from delivery_driver
+    select person_id from delivery_driver
 )
 SELECT pers.name, pers.surname
-	FROM person as pers
-	JOIN customer as cust on cust.person_id = pers.id
-	JOIN deldri on deldri.person_id = pers.id;
-	
+    FROM person as pers
+    JOIN customer as cust on cust.person_id = pers.id
+    JOIN deldri on deldri.person_id = pers.id;
+    
 /* A2.2
 *Situation: 
 *Wir wollen Wissen, wie oft, welche Pizza schon bestellt wurde.
 */
 
 SELECT piztyp.name, sum (item.amount) as amount
-	FROM pizza_type as piztyp
-		JOIN order_item as item ON item.pizza_type = piztyp.id
-	GROUP BY piztyp.name;
+    FROM pizza_type as piztyp
+        JOIN order_item as item ON item.pizza_type = piztyp.id
+    GROUP BY piztyp.name;
 /*Situation:
 *Wir wollen ein Ranking haben, von der meist- bis zur wenigstbestellten Pizza.
 */
 SELECT piztyp.name, rank() OVER(ORDER BY sum(item.amount) desc)
-	FROM pizza_type as piztyp
-		JOIN order_item as item ON item.pizza_type = piztyp.id
-	GROUP BY piztyp.name;
+    FROM pizza_type as piztyp
+        JOIN order_item as item ON item.pizza_type = piztyp.id
+    GROUP BY piztyp.name;
 
 /* A3.1
 *Situation:
@@ -125,7 +125,7 @@ CREATE VIEW view_order_totals AS
       OI.order AS order_id,
       (OI.amount * P.price) AS price
     FROM order_item AS OI
-    JOIN View_PizzaPrices AS P ON P.id = OI.pizza_type
+    JOIN view_pizza_prices AS P ON P.id = OI.pizza_type
   )
   SELECT
     O.id,
@@ -169,7 +169,7 @@ SELECT id, name, surname, address, total FROM view_customer_total_spending;
 
 /* A3.2
 *Situation:
-*
+* Wir wollen unsere Vegetarischen Toppings anpassen können
 */
 
 CREATE VIEW view_vegi_toppings AS
