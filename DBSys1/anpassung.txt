@@ -1,0 +1,16 @@
+Mit je einer untertabelle.....
+Gross-Klein im rel. modell
+
+sql-schema:
+tabellen kleinschreiben
+attribute kleinschreiben
+delivery_driver anstatt DeliveryDriver
+
+datentypen grossschreiben alle
+
+
+sql-insert:
+alle inserts auf neue zeile.
+
+constraints:
+einrücken.
