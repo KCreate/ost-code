@@ -23,7 +23,7 @@ SELECT pers.name, pers.surname, pers.address, "order".date
     WHERE piztyp.name = 'Margherita'
         AND "order".date > '2020-05-01'
         AND "order".date < '2020-05-30';
-        
+
 /* A1.3
 *Situation:
 *Wir wollen wissen, welche Pizzatypen nur vegetarische Toppings haben.
@@ -33,25 +33,25 @@ SELECT pers.name, pers.surname, pers.address, "order".date
 SELECT DISTINCT piztyp.name
     FROM pizza_type as piztyp
     WHERE piztyp.id NOT IN (
-            SELECT ing.pizza_type FROM ingredient as ing
-                JOIN topping as top ON top.id = ing.topping
-            WHERE top.vegetarian = FALSE
+        SELECT ing.pizza_type FROM ingredient as ing
+            JOIN topping as top ON top.id = ing.topping
+        WHERE top.vegetarian = FALSE
     );
-        
+
 /* A1.4
 *Situation:
 *Wir wollen wissen, welche Topping überdurchschnittlich viel kosten.
 */
 
-SELECT top.name, top.price 
+SELECT top.name, top.price
     FROM topping as top
     WHERE top.price > ANY (
-        SELECT AVG(price) 
+        SELECT AVG(price)
             FROM topping
     );
-    
+
 /* A2.1
-*Situation: 
+*Situation:
 *Wir wollen wissen, welche Mitarbeiter (delivery-drivers) auch Kunden sind.
 */
 
@@ -61,7 +61,7 @@ SELECT pers.name, pers.surname
     WHERE cust.person_id IN (
         SELECT person_id from delivery_driver
     );
-    
+
 WITH deldri as (
     select person_id from delivery_driver
 )
@@ -69,9 +69,9 @@ SELECT pers.name, pers.surname
     FROM person as pers
     JOIN customer as cust on cust.person_id = pers.id
     JOIN deldri on deldri.person_id = pers.id;
-    
+
 /* A2.2
-*Situation: 
+*Situation:
 *Wir wollen Wissen, wie oft, welche Pizza schon bestellt wurde.
 */
 
@@ -93,13 +93,14 @@ SELECT piztyp.name, rank() OVER(ORDER BY sum(item.amount) desc)
 * Dafür haben wir 3 Views erstellt, welche voneinander abhängen:
 */
 
-
 DROP VIEW IF EXISTS view_customer_total_spending;
 DROP VIEW IF EXISTS view_order_totals;
 DROP VIEW IF EXISTS view_pizza_prices;
 DROP VIEW IF EXISTS view_vegi_toppings;
 
-
+/*
+ * Totalpreise einzelner Pizzas
+ * */
 CREATE VIEW view_pizza_prices AS
   WITH ingredient_prices AS (
     SELECT
@@ -117,7 +118,7 @@ CREATE VIEW view_pizza_prices AS
   JOIN ingredient_prices AS I ON I.pizza_type = P.id;
 
 /*
- * Total cost of individual orders
+ * Totalpreis einzelner Bestellungen
  */
 CREATE VIEW view_order_totals AS
   WITH item_totals AS (
@@ -136,7 +137,7 @@ CREATE VIEW view_order_totals AS
   GROUP BY O.id;
 
 /*
- * How much money each customer has spent in total
+ * Gesamte Menge an Geld welche jeder Kunde in unserer Pizzeria ausgegeben hat
  */
 CREATE VIEW view_customer_total_spending AS
   WITH
@@ -168,7 +169,7 @@ CREATE VIEW view_customer_total_spending AS
 SELECT id, name, surname, address, total FROM view_customer_total_spending;
 
 /* A3.2
-*Situation:
+* Situation:
 * Wir wollen unsere Vegetarischen Toppings anpassen können
 */
 
@@ -177,7 +178,6 @@ CREATE VIEW view_vegi_toppings AS
   FROM topping
   WHERE vegetarian = true;
 
- 
 SELECT * FROM view_vegi_toppings;
 UPDATE view_vegi_toppings SET price = 5 WHERE name = 'Ananas';
 SELECT * FROM view_vegi_toppings;

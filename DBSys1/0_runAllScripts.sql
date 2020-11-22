@@ -9,8 +9,8 @@ CREATE DATABASE pizzaDB WITH OWNER = pizzauser;
 
 \c pizzadb;
 \i '2_schema.sql';
-\i '4_constraints.sql';
+\i '3_constraints.sql';
 BEGIN;
-\i '3_inserts.sql';
+\i '4_inserts.sql';
 COMMIT;
 \i '5_queries.sql'
