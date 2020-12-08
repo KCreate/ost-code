@@ -181,3 +181,22 @@ CREATE VIEW view_vegi_toppings AS
 SELECT * FROM view_vegi_toppings;
 UPDATE view_vegi_toppings SET price = 5 WHERE name = 'Ananas';
 SELECT * FROM view_vegi_toppings;
+
+
+--Testat 4 A1 liste aller pizzalieferanten (vorname, nachname) mit deren teuerster lieferung (preis, bestellnummer)
+
+SELECT name, surname, order_price.price, order_price.oid
+FROM person AS p
+JOIN delivery_driver AS dd ON dd.person_id = p.id -- check if delivery driver
+JOIN lateral(
+	SELECT sum(t.price * oi.amount) AS price, o.id AS oid
+	FROM topping AS t
+	JOIN ingredient AS i ON i.topping = t.id
+	JOIN pizza_type AS pt ON pt.id = i.pizza_type
+	JOIN order_item AS oi ON oi.pizza_type = pt.id
+	JOIN "order" AS o ON o.id = oi."order"
+	WHERE o.delivery_driver = dd.id
+	GROUP BY o.id
+	ORDER BY price desc
+	LIMIT 1
+) AS order_price ON true;
