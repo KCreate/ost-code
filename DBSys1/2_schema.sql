@@ -54,3 +54,10 @@ CREATE TABLE ingredient (
     topping    INT     NOT NULL REFERENCES topping DEFERRABLE INITIALLY DEFERRED,
     extra      BOOLEAN NOT NULL
 );
+
+CREATE TYPE pizza_name AS ENUM ('Margherita', 'Funghi', 'Salami', 'Speciale', 'Marinara', 'Prosciutto', 'Diavolo');
+
+ALTER TABLE pizza_type
+    ALTER COLUMN name TYPE pizza_name USING name::pizza_name;
+
+CREATE INDEX person_name_idx ON person (lower(name));

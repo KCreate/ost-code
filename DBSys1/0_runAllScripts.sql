@@ -13,4 +13,4 @@ CREATE DATABASE pizzaDB WITH OWNER = pizzauser;
 BEGIN;
 \i '3_inserts.sql';
 COMMIT;
-\i '5_queries.sql'
+--\i '5_queries.sql'

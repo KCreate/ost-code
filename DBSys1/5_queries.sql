@@ -200,3 +200,20 @@ JOIN lateral(
 	ORDER BY price desc
 	LIMIT 1
 ) AS order_price ON true;
+
+--Testat 4 A3 -> diese inserts sollten fehlschlagen!
+
+-- enum verletzung
+INSERT INTO pizza_type (name)
+VALUES
+    ('iamnotapizzatype');
+
+-- unique-constraint verletzung
+INSERT INTO topping (name, price, vegetarian)
+VALUES
+    ('Oliven', 3.0, true);
+
+-- boolean verletzung
+INSERT INTO topping (name, price, vegetarian)
+VALUES
+    ('Chilli', 3.0, 'fulse');
