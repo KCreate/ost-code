@@ -1,0 +1,15 @@
+#game-title {
+  display: block;
+  width: 100%;
+
+  color: blueviolet;
+  text-align: center;
+}
+
+#game-subtitle {
+  display: block;
+  width: 100%;
+
+  color: grey;
+  text-align: center;
+}
