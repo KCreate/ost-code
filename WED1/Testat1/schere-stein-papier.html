@@ -4,18 +4,53 @@
     <meta charset="UTF-8">
     <title>Schere Stein Papier</title>
     <link rel="stylesheet" href="styles/global.css">
-    <script src="scripts/main.js" type="module"></script>
   </head>
   <body>
     <h1 id="game-title">Schere Stein Papier</h1>
     <h4 id="game-subtitle">WED1 Testat1 - Leonard Schütz</h4>
 
     <div id="startpage">
-
+      <div id="startpage-scoreboard-container">
+        <h2>Rangliste</h2>
+        <div id="startpage-scoreboard-entry-container">
+        </div>
+      </div>
+      <hr>
+      <div id="startpage-form-container">
+        <p id="startpage-statusline"></p>
+        <p>Starten Sie ein neues Spiel:</p>
+        <form id="startpage-form">
+          <label>Name: <input type="text" name="name" id="startpage-form-name" placeholder="Max Mustermann"></label>
+          <input type="submit">
+        </form>
+      </div>
     </div>
 
     <div id="gamepage">
-
+      <p>
+        <span id="gamepage-username">??</span>!
+        Wähle deine Hand!
+      </p>
+      <div id="gamepage-choice-container">
+        <button id="gamepage-choice-scissor">Schere</button>
+        <button id="gamepage-choice-stone">Stein</button>
+        <button id="gamepage-choice-paper">Papier</button>
+      </div>
+      <div id="gamepage-activity">
+        <p id="gamepage-statusline">VS</p>
+        <div id="gamepage-enemy-choice">?</div>
+      </div>
+      <button id="gamepage-back-button">Zurück zum Ranking</button>
+      <hr>
+      <p>History</p>
+      <table id="gamepage-history">
+        <tr>
+          <th>Resultat</th>
+          <th>Spieler</th>
+          <th>Gegner</th>
+        </tr>
+      </table>
     </div>
+    <script src="scripts/main.js" type="module"></script>
   </body>
 </html>

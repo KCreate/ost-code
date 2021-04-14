@@ -1,12 +1,6 @@
-const DELAY_MS = 1000;
+const DELAY_MS = 100;
 
-const playerStats = {
-  // MaxMustermann: {
-  //   name: 'MaxMustermann',
-  //   win: 420,
-  //   lost: 0,
-  // },
-};
+const playerStats = {};
 
 function getRankingsFromPlayerStats() {
   const playerNames = Object.keys(playerStats);
@@ -17,6 +11,11 @@ function getRankingsFromPlayerStats() {
     const playerName = playerNames[i];
     const stats = playerStats[playerName];
 
+    // players with 0 wins are not listed on the scoreboard
+    if (stats.win === 0) {
+      continue;
+    }
+
     // initialize entry or append to players array
     if (ranking[stats.win] === undefined) {
       ranking[stats.win] = { rank: null, wins: stats.win, players: [stats.name] };
@@ -26,7 +25,7 @@ function getRankingsFromPlayerStats() {
   }
 
   // remove holes from ranking array
-  ranking = ranking.filter((element) => element != null);
+  ranking = ranking.filter((element) => element !== null);
 
   // sort by win amount
   ranking.sort((lhs, rhs) => rhs.wins - lhs.wins);
@@ -53,8 +52,7 @@ export function isConnected() {
 
 export function getRankings(rankingsCallbackHandlerFn) {
   const rankingsArray = getRankingsFromPlayerStats();
-  // setTimeout(() => rankingsCallbackHandlerFn(rankingsArray), DELAY_MS);
-  setTimeout(() => rankingsCallbackHandlerFn(rankingsArray), 0);
+  setTimeout(() => rankingsCallbackHandlerFn(rankingsArray), DELAY_MS);
 }
 
 const evalLookup = {
@@ -79,15 +77,30 @@ function getGameEval(playerHand, systemHand) {
   return evalLookup[playerHand][systemHand];
 }
 
+function updateRanking(playerName, gameEval) {
+  // initialite a record for the player
+  if (!playerStats.hasOwnProperty(playerName)) {
+    playerStats[playerName] = {
+      name: playerName,
+      win: 0,
+      lost: 0
+    };
+  }
+
+  // update scoreboard
+  if (gameEval === -1) {
+    playerStats[playerName].win++;
+  } else if (gameEval === 1) {
+    playerStats[playerName].lost++;
+  }
+}
+
 export function evaluateHand(playerName, playerHand, gameRecordHandlerCallbackFn) {
-  // TODO: replace calculation of didWin and update rankings while doing so.
-  //
-  // TODO: in local-mode (isConnected == false) store rankings in
-  // the browser localStorage
-  //
-  // TODO: https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API
   const systemHand = HANDS[Math.floor(Math.random() * 3)];
-  const gameEval = Math.floor(Math.random() * 3) - 1; // eval and hand do not match yet -> TODO
+  const gameEval = getGameEval(playerHand, systemHand);
+
+  updateRanking(playerName, gameEval);
+
   setTimeout(() => gameRecordHandlerCallbackFn({ playerHand, systemHand, gameEval }), DELAY_MS);
 }
 
