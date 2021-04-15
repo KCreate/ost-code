@@ -83,7 +83,7 @@ function updateRanking(playerName, gameEval) {
     playerStats[playerName] = {
       name: playerName,
       win: 0,
-      lost: 0
+      lost: 0,
     };
   }
 
