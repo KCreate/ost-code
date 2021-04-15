@@ -10,17 +10,21 @@
     <h4 id="game-subtitle">WED1 Testat1 - Leonard Schütz</h4>
 
     <div id="startpage">
-      <div id="startpage-scoreboard-container">
+      <div>
         <h2>Rangliste</h2>
         <div id="startpage-scoreboard-entry-container">
         </div>
       </div>
       <hr>
-      <div id="startpage-form-container">
-        <p id="startpage-statusline"></p>
+      <div>
         <p>Starten Sie ein neues Spiel:</p>
         <form id="startpage-form">
-          <label>Name: <input type="text" name="name" id="startpage-form-name" placeholder="Max Mustermann"></label>
+          <label>Name: <input type="text"
+                              name="name"
+                              id="startpage-form-name"
+                              placeholder="Max Mustermann"
+                              required
+                              minlength="3"></label>
           <button type="submit">Spielen</button>
         </form>
       </div>
@@ -37,7 +41,7 @@
         <button id="gamepage-choice-paper" class="big-button">Papier</button>
       </div>
       <div id="gamepage-activity">
-        <p id="gamepage-statusline">VS</p>
+        <p id="gamepage-statusline"></p>
         <div id="gamepage-enemy-choice">?</div>
       </div>
       <button id="gamepage-back-button" class="big-button">Zurück zum Ranking</button>

@@ -11,16 +11,12 @@ function getRankingsFromPlayerStats() {
     const playerName = playerNames[i];
     const stats = playerStats[playerName];
 
-    // players with 0 wins are not listed on the scoreboard
-    if (stats.win === 0) {
-      continue;
-    }
-
-    // initialize entry or append to players array
-    if (ranking[stats.win] === undefined) {
-      ranking[stats.win] = { rank: null, wins: stats.win, players: [stats.name] };
-    } else {
-      ranking[stats.win].players.push(stats.name);
+    if (stats.win !== 0) {
+      if (ranking[stats.win] === undefined) {
+        ranking[stats.win] = { rank: null, wins: stats.win, players: [stats.name] };
+      } else {
+        ranking[stats.win].players.push(stats.name);
+      }
     }
   }
 
@@ -79,7 +75,7 @@ function getGameEval(playerHand, systemHand) {
 
 function updateRanking(playerName, gameEval) {
   // initialite a record for the player
-  if (!playerStats.hasOwnProperty(playerName)) {
+  if (playerStats[playerName] === undefined) {
     playerStats[playerName] = {
       name: playerName,
       win: 0,

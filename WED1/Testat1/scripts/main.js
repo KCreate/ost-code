@@ -1,27 +1,20 @@
 // template game-service API
 import {
-  HANDS,
-  isConnected,
   getRankings,
   evaluateHand,
 } from './game-service.js';
 
 // register DOM nodes
 const domStartPage = document.getElementById('startpage');
-const domStartPageScoreBoardContainer = document.getElementById('startpage-scoreboard-container');
 const domStartPageScoreBoardEntryContainer = document.getElementById('startpage-scoreboard-entry-container');
-const domStartPageFormContainer = document.getElementById('startpage-form-container');
-const domStartPageFormStatusline = document.getElementById('startpage-statusline');
 const domStartPageForm = document.getElementById('startpage-form');
 const domStartPageFormName = document.getElementById('startpage-form-name');
 
 const domGamePage = document.getElementById('gamepage');
 const domGamePageUsername = document.getElementById('gamepage-username');
-const domGamePageChoiceContainer = document.getElementById('gamepage-choice-container');
 const domGamePageChoiceScissor = document.getElementById('gamepage-choice-scissor');
 const domGamePageChoiceStone = document.getElementById('gamepage-choice-stone');
 const domGamePageChoicePaper = document.getElementById('gamepage-choice-paper');
-const domGamePageActivity = document.getElementById('gamepage-activity');
 const domGamePageStatusline = document.getElementById('gamepage-statusline');
 const domGamePageEnemyChoice = document.getElementById('gamepage-enemy-choice');
 const domGamePageBackButton = document.getElementById('gamepage-back-button');
@@ -61,11 +54,8 @@ const kMoveDisplayNames = {
   paper: 'Papier',
 };
 
-// UI text
-const kErrorInvalidUsername = 'Bitte geben Sie einen validen Nutzernamen ein!';
-const kErrorInvalidGameState = 'Invalider Spielzustand!';
-
-const kGameDelay = 1500; // ms to wait between turns
+// ms to wait between turns
+const kGameDelay = 1500;
 
 // builds the DOM structure for a scoreboard entry
 function createStartScoreboardEntryNode(ranking) {
@@ -73,22 +63,22 @@ function createStartScoreboardEntryNode(ranking) {
   node.classList.add('startpage-scoreboard-entry');
 
   const header = document.createElement('p');
-  const player_list = document.createElement('p');
+  const playerList = document.createElement('p');
 
   header.textContent = `${ranking.rank}. Platz mit ${ranking.wins} Siegen`;
 
   for (let i = 0; i < ranking.players.length; i++) {
     const player = ranking.players[i];
 
-    if (i != 0) {
-      player_list.textContent += ', ';
+    if (i !== 0) {
+      playerList.textContent += ', ';
     }
 
-    player_list.textContent += player;
+    playerList.textContent += player;
   }
 
   node.appendChild(header);
-  node.appendChild(player_list);
+  node.appendChild(playerList);
 
   return node;
 }
@@ -98,8 +88,8 @@ function createGameScoreboardEntryNode(ranking) {
   const node = document.createElement('tr');
 
   const result = document.createElement('td');
-  const user_hand = document.createElement('td');
-  const enemy_hand = document.createElement('td');
+  const userHand = document.createElement('td');
+  const enemyHand = document.createElement('td');
 
   result.dataset.gameEval = ranking.gameEval;
 
@@ -107,12 +97,12 @@ function createGameScoreboardEntryNode(ranking) {
   //  0     -> tied
   //  1     -> lose
   result.textContent = ['Gewonnen', 'Unentschieden', 'Verloren'][ranking.gameEval + 1];
-  user_hand.textContent = kMoveDisplayNames[ranking.playerHand];
-  enemy_hand.textContent = kMoveDisplayNames[ranking.systemHand];
+  userHand.textContent = kMoveDisplayNames[ranking.playerHand];
+  enemyHand.textContent = kMoveDisplayNames[ranking.systemHand];
 
   node.appendChild(result);
-  node.appendChild(user_hand);
-  node.appendChild(enemy_hand);
+  node.appendChild(userHand);
+  node.appendChild(enemyHand);
 
   return node;
 }
@@ -125,19 +115,18 @@ class StonePaperScissorGame {
     this.user_choice = null;
     this.enemy_choice = null;
     this.game_eval = null;
-    this.error_message = null;
     this.game_history = [];
 
     this.selected_choice_dom_button = null;
 
     // start page username form submit
-    domStartPageForm.onsubmit = (event) => {
+    domStartPageForm.onsubmit = () => {
       this.playGame(domStartPageFormName.value);
       return false; // don't reload page
     };
 
     // game page back button
-    domGamePageBackButton.onclick = (event) => {
+    domGamePageBackButton.onclick = () => {
       this.exitGame();
     };
 
@@ -156,17 +145,9 @@ class StonePaperScissorGame {
   }
 
   playGame(username) {
-    if (this.state != kStateMain) {
-      throw new Error(kErrorInvalidGameState);
+    if (this.state !== kStateMain) {
+      throw new Error('Invalider Spielzustand!');
     }
-
-    // validate username
-    if (username.length === 0) {
-      this.error_message = kErrorInvalidUsername;
-      this.updateView();
-      return;
-    }
-      this.error_message = null;
 
     this.state = kStateChooseMove;
     this.username = username;
@@ -174,8 +155,8 @@ class StonePaperScissorGame {
   }
 
   exitGame() {
-    if (this.state != kStateChooseMove) {
-      throw new Error(kErrorInvalidGameState);
+    if (this.state !== kStateChooseMove) {
+      throw new Error('Invalider Spielzustand!');
     }
 
     this.state = kStateMain;
@@ -185,8 +166,8 @@ class StonePaperScissorGame {
   }
 
   chooseMove(choice) {
-    if (this.state != kStateChooseMove) {
-      throw new Error(kErrorInvalidGameState);
+    if (this.state !== kStateChooseMove) {
+      throw new Error('Invalider Spielzustand!');
     }
 
     this.user_choice = choice;
@@ -228,13 +209,6 @@ class StonePaperScissorGame {
     switch (this.state) {
       case kStateMain: {
         this.updateMainScoreboard();
-
-        if (this.error_message) {
-          domStartPageFormStatusline.classList.remove('element-hidden');
-          domStartPageFormStatusline.textContent = this.error_message;
-        } else {
-          domStartPageFormStatusline.classList.add('element-hidden');
-        }
 
         domStartPageFormName.value = '';
 
@@ -280,6 +254,9 @@ class StonePaperScissorGame {
             this.selected_choice_dom_button = domGamePageChoicePaper;
             break;
           }
+          default: {
+            throw new Error('unexpected choice');
+          }
         }
 
         domGamePageStatusline.textContent = 'Gegner ist am Zug...';
@@ -293,6 +270,7 @@ class StonePaperScissorGame {
         domGamePageBackButton.disabled = true;
 
         this.selected_choice_dom_button.classList.remove('selected_by_user');
+
         switch (this.game_eval) {
           case -1: { // won
             this.selected_choice_dom_button.classList.add('winning_choice');
@@ -309,6 +287,9 @@ class StonePaperScissorGame {
             domGamePageEnemyChoice.classList.add('winning_choice');
             break;
           }
+          default: {
+            throw new Error('unexpected value');
+          }
         }
 
         domGamePageStatusline.textContent = 'Nächste Runde beginnt in Kürze';
@@ -316,21 +297,27 @@ class StonePaperScissorGame {
         this.updateGameScoreboard();
         break;
       }
+      default: {
+        throw new Error('unexpected state');
+      }
     }
   }
 
   updateMainScoreboard() {
     getRankings((ranking) => {
-      // clear scoreboard
-      while (domStartPageScoreBoardEntryContainer.lastElementChild) {
-        domStartPageScoreBoardEntryContainer.removeChild(domStartPageScoreBoardEntryContainer.lastElementChild);
-      }
+      if (this.state === kStateMain) {
+        // clear scoreboard
+        const container = domStartPageScoreBoardEntryContainer;
+        while (container.lastElementChild) {
+          container.removeChild(container.lastElementChild);
+        }
 
-      // display the top 10 ranks
-      for (let i = 0; i < ranking.length && i < 10; i++) {
-        const entry = ranking[i];
-        const entry_dom_node = createStartScoreboardEntryNode(entry);
-        domStartPageScoreBoardEntryContainer.appendChild(entry_dom_node);
+        // display the top 10 ranks
+        for (let i = 0; i < ranking.length && i < 10; i++) {
+          const entry = ranking[i];
+          const entryDomNode = createStartScoreboardEntryNode(entry);
+          domStartPageScoreBoardEntryContainer.appendChild(entryDomNode);
+        }
       }
     });
   }
@@ -344,13 +331,14 @@ class StonePaperScissorGame {
     // insert new entries
     for (let i = 0; i < this.game_history.length; i++) {
       const result = this.game_history[i];
-      const result_dom_node = createGameScoreboardEntryNode(result);
-      domGamePageHistory.appendChild(result_dom_node);
+      const resultDomNode = createGameScoreboardEntryNode(result);
+      domGamePageHistory.appendChild(resultDomNode);
     }
   }
 }
 
 // wait for the document to be ready
+const game = new StonePaperScissorGame();
 document.addEventListener('DOMContentLoaded', () => {
-  const game = new StonePaperScissorGame();
+  game.updateView();
 });

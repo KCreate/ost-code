@@ -83,10 +83,6 @@ p {
     box-shadow: 0 4px 10px -6px rgb(0 0 0 / 40%);
 }
 
-#startpage-statusline {
-    color: red;
-}
-
 #startpage-form {
     max-width: 290px;
     margin: 0 auto;
