@@ -1,4 +1,4 @@
-const DELAY_MS = 100;
+const DELAY_MS = 1000;
 
 const playerStats = {};
 

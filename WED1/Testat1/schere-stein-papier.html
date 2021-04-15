@@ -21,28 +21,28 @@
         <p>Starten Sie ein neues Spiel:</p>
         <form id="startpage-form">
           <label>Name: <input type="text" name="name" id="startpage-form-name" placeholder="Max Mustermann"></label>
-          <input type="submit">
+          <button type="submit">Spielen</button>
         </form>
       </div>
     </div>
 
     <div id="gamepage">
+      <h2>Lokales Spiel</h2>
       <p>
-        <span id="gamepage-username">??</span>!
-        Wähle deine Hand!
+        Hallo <span id="gamepage-username">??</span>!
       </p>
       <div id="gamepage-choice-container">
-        <button id="gamepage-choice-scissor">Schere</button>
-        <button id="gamepage-choice-stone">Stein</button>
-        <button id="gamepage-choice-paper">Papier</button>
+        <button id="gamepage-choice-scissor" class="big-button">Schere</button>
+        <button id="gamepage-choice-stone" class="big-button">Stein</button>
+        <button id="gamepage-choice-paper" class="big-button">Papier</button>
       </div>
       <div id="gamepage-activity">
         <p id="gamepage-statusline">VS</p>
         <div id="gamepage-enemy-choice">?</div>
       </div>
-      <button id="gamepage-back-button">Zurück zum Ranking</button>
+      <button id="gamepage-back-button" class="big-button">Zurück zum Ranking</button>
       <hr>
-      <p>History</p>
+      <h2>History</h2>
       <table id="gamepage-history">
         <tr>
           <th>Resultat</th>

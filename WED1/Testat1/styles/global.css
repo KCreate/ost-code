@@ -1,27 +1,209 @@
-#game-title {
-  display: block;
-  width: 100%;
+:root {
+    --main-accent-color: #ffe257;
+    --main-win-color: #1da627ba;
+    --main-tie-color: #56555acf;
+    --main-lost-color: #f62929c2;
+}
 
-  color: blueviolet;
-  text-align: center;
+* {
+    box-sizing: border-box;
+    font-family: "Helvetica", "Arial", sans-serif;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    display: block;
+    width: 100%;
+    margin: 0 auto;
+    text-align: center;
+}
+
+button {
+    background-color: white;
+    border: 2px solid rgb(0 0 0 / 10%);
+    border-radius: 5px;
+    padding: 3px 7px;
+}
+
+button:hover:enabled,
+input:hover:enabled {
+    cursor: pointer;
+}
+
+.big-button {
+    font-size: 15pt;
+    padding: 20px 0;
+    box-shadow: 0 4px 5px -6px rgb(0 0 0 / 40%);
+    background-color: hsl(51deg 100% 98%);
+    transition: 150ms ease-in-out;
+}
+
+.big-button:hover:enabled {
+    box-shadow: 0 4px 10px -6px rgb(0 0 0 / 40%);
+    transform: translate(0, -2px);
+    background-color: white;
+}
+
+input[type="text"] {
+    background-color: white;
+    border: 2px solid rgb(0 0 0 / 10%);
+    border-radius: 5px;
+    padding: 3px 7px;
+}
+
+hr {
+    border: 1px solid rgb(0 0 0 / 20%);
+}
+
+p {
+    text-align: center;
+}
+
+#game-title {
+    margin: 30px auto;
 }
 
 #game-subtitle {
-  display: block;
-  width: 100%;
+    color: grey;
+}
 
-  color: grey;
-  text-align: center;
+#startpage,
+#gamepage {
+    max-width: 600px;
+    margin: 0 auto;
+    margin-top: 50px;
+    padding: 10px;
+    background-color: var(--main-accent-color);
+    border: 2px solid rgb(0 0 0 / 10%);
+    border-radius: 5px;
+    box-shadow: 0 4px 10px -6px rgb(0 0 0 / 40%);
 }
 
 #startpage-statusline {
-  color: red;
+    color: red;
+}
+
+#startpage-form {
+    max-width: 290px;
+    margin: 0 auto;
 }
 
 #gamepage-username {
-  font-weight: bold;
+    font-weight: bold;
+}
+
+#gamepage-choice-container {
+    background-color: #ffec8e;
+    padding: 15px 10px;
+    border-radius: 5px;
+}
+
+#gamepage-choice-container button {
+    width: calc(100% / 3 - 3px);
+    border-radius: 30px;
+}
+
+@keyframes selected-animation {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    25% {
+        transform: rotate(1deg);
+    }
+
+    50% {
+        transform: rotate(0deg);
+    }
+
+    75% {
+        transform: rotate(-1deg);
+    }
+}
+
+#gamepage-choice-container button.selected_by_user {
+    background-color: white;
+    animation: selected-animation 200ms infinite;
+}
+
+#gamepage-choice-container button.winning_choice,
+#gamepage-enemy-choice.winning_choice {
+    background-color: var(--main-win-color);
+    color: white;
+}
+
+#gamepage-choice-container button.tie_choice,
+#gamepage-enemy-choice.tie_choice {
+    background-color: var(--main-tie-color);
+    color: white;
+}
+
+#gamepage-choice-container button.lost_choice,
+#gamepage-enemy-choice.lost_choice {
+    background-color: var(--main-lost-color);
+    color: white;
+}
+
+#gamepage-choice-container button:focus {
+    outline: 0;
+}
+
+#gamepage-activity {
+    margin: 10px auto;
+}
+
+#gamepage-enemy-choice {
+    background-color: hsl(51deg 100% 98%);
+    box-shadow: 0 4px 5px -6px rgb(0 0 0 / 40%);
+    font-size: 15pt;
+    border-radius: 10px;
+    text-align: center;
+    max-width: 100px;
+    margin: 0 auto;
+    padding: 20px 0;
+}
+
+#gamepage-back-button {
+    width: 75%;
+    margin: 15px auto;
+    display: block;
+    padding: 15px 0;
+}
+
+#gamepage-history {
+    width: 100%;
+    table-layout: fixed;
+}
+
+#gamepage-history th {
+    background-color: white;
+    padding: 5px 10px;
+}
+
+#gamepage-history td {
+    background-color: white;
+    padding: 5px 10px;
+}
+
+#gamepage-history td[data-game-eval="-1"] {
+    background-color: var(--main-win-color);
+    color: white;
+}
+
+#gamepage-history td[data-game-eval="0"] {
+    background-color: var(--main-tie-color);
+    color: white;
+}
+
+#gamepage-history td[data-game-eval="1"] {
+    background-color: var(--main-lost-color);
+    color: white;
 }
 
 .element-hidden {
-  display: none;
+    display: none;
 }

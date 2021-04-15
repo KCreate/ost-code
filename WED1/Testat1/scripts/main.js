@@ -6,31 +6,26 @@ import {
   evaluateHand
 } from './game-service.js';
 
-window.someglobal = {
-  isConnected,
-  getRankings,
-};
-
 // register DOM nodes
-const domStartPage                         = document.getElementById("startpage");
-const domStartPageScoreBoardContainer      = document.getElementById("startpage-scoreboard-container");
+const domStartPage = document.getElementById("startpage");
+const domStartPageScoreBoardContainer = document.getElementById("startpage-scoreboard-container");
 const domStartPageScoreBoardEntryContainer = document.getElementById("startpage-scoreboard-entry-container");
-const domStartPageFormContainer            = document.getElementById("startpage-form-container");
-const domStartPageFormStatusline           = document.getElementById("startpage-statusline");
-const domStartPageForm                     = document.getElementById("startpage-form");
-const domStartPageFormName                 = document.getElementById("startpage-form-name");
+const domStartPageFormContainer = document.getElementById("startpage-form-container");
+const domStartPageFormStatusline = document.getElementById("startpage-statusline");
+const domStartPageForm = document.getElementById("startpage-form");
+const domStartPageFormName = document.getElementById("startpage-form-name");
 
-const domGamePage                = document.getElementById("gamepage");
-const domGamePageUsername        = document.getElementById("gamepage-username");
+const domGamePage = document.getElementById("gamepage");
+const domGamePageUsername = document.getElementById("gamepage-username");
 const domGamePageChoiceContainer = document.getElementById("gamepage-choice-container");
-const domGamePageChoiceScissor   = document.getElementById("gamepage-choice-scissor");
-const domGamePageChoiceStone     = document.getElementById("gamepage-choice-stone");
-const domGamePageChoicePaper     = document.getElementById("gamepage-choice-paper");
-const domGamePageActivity        = document.getElementById("gamepage-activity");
-const domGamePageStatusline      = document.getElementById("gamepage-statusline");
-const domGamePageEnemyChoice     = document.getElementById("gamepage-enemy-choice");
-const domGamePageBackButton      = document.getElementById("gamepage-back-button");
-const domGamePageHistory         = document.getElementById("gamepage-history");
+const domGamePageChoiceScissor = document.getElementById("gamepage-choice-scissor");
+const domGamePageChoiceStone = document.getElementById("gamepage-choice-stone");
+const domGamePageChoicePaper = document.getElementById("gamepage-choice-paper");
+const domGamePageActivity = document.getElementById("gamepage-activity");
+const domGamePageStatusline = document.getElementById("gamepage-statusline");
+const domGamePageEnemyChoice = document.getElementById("gamepage-enemy-choice");
+const domGamePageBackButton = document.getElementById("gamepage-back-button");
+const domGamePageHistory = document.getElementById("gamepage-history");
 
 // game states
 //
@@ -50,21 +45,27 @@ const domGamePageHistory         = document.getElementById("gamepage-history");
 // │ Timeout ◄─────┤ Battle │ enemy is now choosing a move
 // └─────────┘     └────────┘
 //
-const kStateMain       = 0;
+const kStateMain = 0;
 const kStateChooseMove = 1;
-const kStateBattle     = 2;
-const kStateTimeout    = 3;
+const kStateBattle = 2;
+const kStateTimeout = 3;
 
 // moves
 const kMoveScissor = "scissors";
 const kMoveStone = "stone";
 const kMovePaper = "paper";
 
+const kMoveDisplayNames = {
+  scissors: "Schere",
+  stone: "Stein",
+  paper: "Papier",
+};
+
 // UI text
 const kErrorInvalidUsername = "Bitte geben Sie einen validen Nutzernamen ein!";
 const kErrorInvalidGameState = "Invalider Spielzustand!";
 
-const kGameDelay = 300; // ms to wait between turns
+const kGameDelay = 1500; // ms to wait between turns
 
 // builds the DOM structure for a scoreboard entry
 function createStartScoreboardEntryNode(ranking) {
@@ -100,13 +101,14 @@ function createGameScoreboardEntryNode(ranking) {
   const user_hand = document.createElement("td");
   const enemy_hand = document.createElement("td");
 
+  result.dataset.gameEval = ranking.gameEval;
 
   // -1     -> win
   //  0     -> tied
   //  1     -> lose
   result.textContent = ["Gewonnen", "Unentschieden", "Verloren"][ranking.gameEval + 1];
-  user_hand.textContent = ranking.playerHand;
-  enemy_hand.textContent = ranking.systemHand;
+  user_hand.textContent = kMoveDisplayNames[ranking.playerHand];
+  enemy_hand.textContent = kMoveDisplayNames[ranking.systemHand];
 
   node.appendChild(result);
   node.appendChild(user_hand);
@@ -122,8 +124,11 @@ class StonePaperScissorGame {
     this.username = null;
     this.user_choice = null;
     this.enemy_choice = null;
+    this.game_eval = null;
     this.error_message = null;
     this.game_history = [];
+
+    this.selected_choice_dom_button = null;
 
     // start page username form submit
     domStartPageForm.onsubmit = (event) => {
@@ -193,6 +198,7 @@ class StonePaperScissorGame {
 
     evaluateHand(this.username, choice, (result) => {
       this.enemy_choice = result.systemHand;
+      this.game_eval = result.gameEval;
       this.game_history.push(result);
 
       this.state = kStateTimeout;
@@ -201,6 +207,8 @@ class StonePaperScissorGame {
       setTimeout(() => {
         this.user_choice = null;
         this.enemy_choice = null;
+        this.game_eval = null;
+        this.selected_choice_dom_button = null;
 
         this.state = kStateChooseMove;
         this.updateView();
@@ -209,7 +217,7 @@ class StonePaperScissorGame {
   }
 
   updateView() {
-    // hide or show the relevant containers
+    // hide or show relevant game pages
     if (this.state === kStateMain) {
       domStartPage.classList.remove("element-hidden");
       domGamePage.classList.add("element-hidden");
@@ -239,6 +247,12 @@ class StonePaperScissorGame {
         domGamePageChoicePaper.disabled = false;
         domGamePageBackButton.disabled = false;
 
+        domGamePageChoiceScissor.classList.remove("selected_by_user", "winning_choice", "tie_choice", "lost_choice");
+        domGamePageChoiceStone.classList.remove("selected_by_user", "winning_choice", "tie_choice", "lost_choice");
+        domGamePageChoicePaper.classList.remove("selected_by_user", "winning_choice", "tie_choice", "lost_choice");
+
+        domGamePageEnemyChoice.classList.remove("winning_choice", "tie_choice", "lost_choice");
+
         domGamePageUsername.textContent = this.username;
         domGamePageStatusline.textContent = "Du bist am Zug...";
         domGamePageEnemyChoice.textContent = "??";
@@ -251,6 +265,24 @@ class StonePaperScissorGame {
         domGamePageChoicePaper.disabled = true;
         domGamePageBackButton.disabled = true;
 
+        switch (this.user_choice) {
+          case kMoveScissor: {
+            domGamePageChoiceScissor.classList.add("selected_by_user");
+            this.selected_choice_dom_button = domGamePageChoiceScissor;
+            break;
+          }
+          case kMoveStone: {
+            domGamePageChoiceStone.classList.add("selected_by_user");
+            this.selected_choice_dom_button = domGamePageChoiceStone;
+            break;
+          }
+          case kMovePaper: {
+            domGamePageChoicePaper.classList.add("selected_by_user");
+            this.selected_choice_dom_button = domGamePageChoicePaper;
+            break;
+          }
+        }
+
         domGamePageStatusline.textContent = "Gegner ist am Zug...";
         this.updateGameScoreboard();
         break;
@@ -261,13 +293,29 @@ class StonePaperScissorGame {
         domGamePageChoicePaper.disabled = true;
         domGamePageBackButton.disabled = true;
 
+        this.selected_choice_dom_button.classList.remove("selected_by_user");
+        switch (this.game_eval) {
+          case -1: { // won
+            this.selected_choice_dom_button.classList.add("winning_choice");
+            domGamePageEnemyChoice.classList.add("lost_choice");
+            break;
+          }
+          case 0: { // tie
+            this.selected_choice_dom_button.classList.add("tie_choice");
+            domGamePageEnemyChoice.classList.add("tie_choice");
+            break;
+          }
+          case 1: { // lost
+            this.selected_choice_dom_button.classList.add("lost_choice");
+            domGamePageEnemyChoice.classList.add("winning_choice");
+            break;
+          }
+        }
+
         domGamePageStatusline.textContent = "Nächste Runde beginnt in Kürze";
-        domGamePageEnemyChoice.textContent = this.enemy_choice;
+        domGamePageEnemyChoice.textContent = kMoveDisplayNames[this.enemy_choice];
         this.updateGameScoreboard();
         break;
-      }
-      default: {
-        throw new Error("invalid game state");
       }
     }
   }
