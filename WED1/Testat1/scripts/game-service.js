@@ -11,12 +11,10 @@ function getRankingsFromPlayerStats() {
     const playerName = playerNames[i];
     const stats = playerStats[playerName];
 
-    if (stats.win !== 0) {
-      if (ranking[stats.win] === undefined) {
-        ranking[stats.win] = { rank: null, wins: stats.win, players: [stats.name] };
-      } else {
-        ranking[stats.win].players.push(stats.name);
-      }
+    if (ranking[stats.win] === undefined) {
+      ranking[stats.win] = { rank: null, wins: stats.win, players: [stats.name] };
+    } else {
+      ranking[stats.win].players.push(stats.name);
     }
   }
 
@@ -34,7 +32,7 @@ function getRankingsFromPlayerStats() {
   return ranking;
 }
 
-export const HANDS = ['scissors', 'stone', 'paper'];
+export const HANDS = ['Schere', 'Stein', 'Papier', 'Brunnen', 'Streichholz'];
 
 let isConnectedState = false;
 
@@ -51,21 +49,44 @@ export function getRankings(rankingsCallbackHandlerFn) {
   setTimeout(() => rankingsCallbackHandlerFn(rankingsArray), DELAY_MS);
 }
 
+const resultWin = -1;
+const resultTie = 0;
+const resultLose = 1;
 const evalLookup = {
-  scissors: {
-    scissors: 0,
-    stone: 1,
-    paper: -1,
+  Schere: {
+    Schere: resultTie,
+    Stein: resultLose,
+    Papier: resultWin,
+    Brunnen: resultLose,
+    Streichholz: resultWin,
   },
-  stone: {
-    scissors: -1,
-    stone: 0,
-    paper: 1,
+  Stein: {
+    Schere: resultWin,
+    Stein: resultTie,
+    Papier: resultLose,
+    Brunnen: resultLose,
+    Streichholz: resultWin,
   },
-  paper: {
-    scissors: 1,
-    stone: -1,
-    paper: 0,
+  Papier: {
+    Schere: resultLose,
+    Stein: resultWin,
+    Papier: resultTie,
+    Brunnen: resultWin,
+    Streichholz: resultLose,
+  },
+  Brunnen: {
+    Schere: resultWin,
+    Stein: resultWin,
+    Papier: resultLose,
+    Brunnen: resultTie,
+    Streichholz: resultLose,
+  },
+  Streichholz: {
+    Schere: resultLose,
+    Stein: resultLose,
+    Papier: resultWin,
+    Brunnen: resultWin,
+    Streichholz: resultTie,
   },
 };
 
@@ -92,7 +113,7 @@ function updateRanking(playerName, gameEval) {
 }
 
 export function evaluateHand(playerName, playerHand, gameRecordHandlerCallbackFn) {
-  const systemHand = HANDS[Math.floor(Math.random() * 3)];
+  const systemHand = HANDS[Math.floor(Math.random() * HANDS.length)];
   const gameEval = getGameEval(playerHand, systemHand);
 
   updateRanking(playerName, gameEval);

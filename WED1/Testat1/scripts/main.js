@@ -1,8 +1,5 @@
-// template game-service API
-import {
-  getRankings,
-  evaluateHand,
-} from './game-service.js';
+// game-service API
+const libGameService = await import('./game-service.js');
 
 // register DOM nodes
 const domStartPage = document.getElementById('startpage');
@@ -12,9 +9,7 @@ const domStartPageFormName = document.getElementById('startpage-form-name');
 
 const domGamePage = document.getElementById('gamepage');
 const domGamePageUsername = document.getElementById('gamepage-username');
-const domGamePageChoiceScissor = document.getElementById('gamepage-choice-scissor');
-const domGamePageChoiceStone = document.getElementById('gamepage-choice-stone');
-const domGamePageChoicePaper = document.getElementById('gamepage-choice-paper');
+const domGamePageChoiceContainer = document.getElementById('gamepage-choice-container');
 const domGamePageStatusline = document.getElementById('gamepage-statusline');
 const domGamePageEnemyChoice = document.getElementById('gamepage-enemy-choice');
 const domGamePageBackButton = document.getElementById('gamepage-back-button');
@@ -42,17 +37,6 @@ const kStateMain = 0;
 const kStateChooseMove = 1;
 const kStateBattle = 2;
 const kStateTimeout = 3;
-
-// moves
-const kMoveScissor = 'scissors';
-const kMoveStone = 'stone';
-const kMovePaper = 'paper';
-
-const kMoveDisplayNames = {
-  scissors: 'Schere',
-  stone: 'Stein',
-  paper: 'Papier',
-};
 
 // ms to wait between turns
 const kGameDelay = 1500;
@@ -97,8 +81,8 @@ function createGameScoreboardEntryNode(ranking) {
   //  0     -> tied
   //  1     -> lose
   result.textContent = ['Gewonnen', 'Unentschieden', 'Verloren'][ranking.gameEval + 1];
-  userHand.textContent = kMoveDisplayNames[ranking.playerHand];
-  enemyHand.textContent = kMoveDisplayNames[ranking.systemHand];
+  userHand.textContent = ranking.playerHand;
+  enemyHand.textContent = ranking.systemHand;
 
   node.appendChild(result);
   node.appendChild(userHand);
@@ -107,11 +91,24 @@ function createGameScoreboardEntryNode(ranking) {
   return node;
 }
 
+// builds the DOM structure for a specific user choice button
+function createUserChoiceButton(choice_name) {
+  const node = document.createElement('button');
+
+  node.classList.add("big-button");
+  node.textContent = choice_name;
+  node.dataset.choiceName = choice_name;
+
+  return node;
+}
+
 // the StonePaperScissorGame class manages the game model and the UI update lifecycle
 class StonePaperScissorGame {
-  constructor() {
+  constructor(game_service) {
+    this.game_service = game_service;
     this.state = kStateMain;
     this.username = null;
+    this.choice_buttons = [];
     this.user_choice = null;
     this.enemy_choice = null;
     this.game_eval = null;
@@ -130,15 +127,17 @@ class StonePaperScissorGame {
       this.exitGame();
     };
 
-    // move choice buttons
-    domGamePageChoiceScissor.onclick = () => {
-      this.chooseMove(kMoveScissor);
-    };
-    domGamePageChoiceStone.onclick = () => {
-      this.chooseMove(kMoveStone);
-    };
-    domGamePageChoicePaper.onclick = () => {
-      this.chooseMove(kMovePaper);
+    // inject user choice buttons into the user choice container div
+    for (let i = 0; i < this.game_service.HANDS.length; i++) {
+      const choice = this.game_service.HANDS[i];
+      const choice_button = createUserChoiceButton(choice);
+      this.choice_buttons.push(choice_button);
+      domGamePageChoiceContainer.appendChild(choice_button);
+    }
+
+    // listen for bubbling click events
+    domGamePageChoiceContainer.onclick = (event) => {
+      this.chooseMove(event.target.dataset.choiceName);
     };
 
     this.updateView();
@@ -176,7 +175,7 @@ class StonePaperScissorGame {
     this.state = kStateBattle;
     this.updateView();
 
-    evaluateHand(this.username, choice, (result) => {
+    this.game_service.evaluateHand(this.username, choice, (result) => {
       this.enemy_choice = result.systemHand;
       this.game_eval = result.gameEval;
       this.game_history.push(result);
@@ -215,14 +214,13 @@ class StonePaperScissorGame {
         break;
       }
       case kStateChooseMove: {
-        domGamePageChoiceScissor.disabled = false;
-        domGamePageChoiceStone.disabled = false;
-        domGamePageChoicePaper.disabled = false;
         domGamePageBackButton.disabled = false;
 
-        domGamePageChoiceScissor.classList.remove('selected_by_user', 'winning_choice', 'tie_choice', 'lost_choice');
-        domGamePageChoiceStone.classList.remove('selected_by_user', 'winning_choice', 'tie_choice', 'lost_choice');
-        domGamePageChoicePaper.classList.remove('selected_by_user', 'winning_choice', 'tie_choice', 'lost_choice');
+        for (let i = 0; i < this.choice_buttons.length; i++) {
+          const button = this.choice_buttons[i];
+          button.disabled = false;
+          button.classList.remove('selected_by_user', 'winning_choice', 'tie_choice', 'lost_choice');
+        }
 
         domGamePageEnemyChoice.classList.remove('winning_choice', 'tie_choice', 'lost_choice');
 
@@ -233,40 +231,26 @@ class StonePaperScissorGame {
         break;
       }
       case kStateBattle: {
-        domGamePageChoiceScissor.disabled = true;
-        domGamePageChoiceStone.disabled = true;
-        domGamePageChoicePaper.disabled = true;
-        domGamePageBackButton.disabled = true;
+        for (let i = 0; i < this.choice_buttons.length; i++) {
+          const button = this.choice_buttons[i];
+          button.disabled = true;
 
-        switch (this.user_choice) {
-          case kMoveScissor: {
-            domGamePageChoiceScissor.classList.add('selected_by_user');
-            this.selected_choice_dom_button = domGamePageChoiceScissor;
-            break;
-          }
-          case kMoveStone: {
-            domGamePageChoiceStone.classList.add('selected_by_user');
-            this.selected_choice_dom_button = domGamePageChoiceStone;
-            break;
-          }
-          case kMovePaper: {
-            domGamePageChoicePaper.classList.add('selected_by_user');
-            this.selected_choice_dom_button = domGamePageChoicePaper;
-            break;
-          }
-          default: {
-            throw new Error('unexpected choice');
+          if (button.dataset.choiceName == this.user_choice) {
+            button.classList.add('selected_by_user');
+            this.selected_choice_dom_button = button;
           }
         }
+        domGamePageBackButton.disabled = true;
 
         domGamePageStatusline.textContent = 'Gegner ist am Zug...';
         this.updateGameScoreboard();
         break;
       }
       case kStateTimeout: {
-        domGamePageChoiceScissor.disabled = true;
-        domGamePageChoiceStone.disabled = true;
-        domGamePageChoicePaper.disabled = true;
+        for (let i = 0; i < this.choice_buttons.length; i++) {
+          const button = this.choice_buttons[i];
+          button.disabled = true;
+        }
         domGamePageBackButton.disabled = true;
 
         this.selected_choice_dom_button.classList.remove('selected_by_user');
@@ -293,7 +277,7 @@ class StonePaperScissorGame {
         }
 
         domGamePageStatusline.textContent = 'Nächste Runde beginnt in Kürze';
-        domGamePageEnemyChoice.textContent = kMoveDisplayNames[this.enemy_choice];
+        domGamePageEnemyChoice.textContent = this.enemy_choice;
         this.updateGameScoreboard();
         break;
       }
@@ -304,19 +288,29 @@ class StonePaperScissorGame {
   }
 
   updateMainScoreboard() {
-    getRankings((ranking) => {
-      if (this.state === kStateMain) {
-        // clear scoreboard
-        const container = domStartPageScoreBoardEntryContainer;
-        while (container.lastElementChild) {
-          container.removeChild(container.lastElementChild);
-        }
 
-        // display the top 10 ranks
-        for (let i = 0; i < ranking.length && i < 10; i++) {
-          const entry = ranking[i];
-          const entryDomNode = createStartScoreboardEntryNode(entry);
-          domStartPageScoreBoardEntryContainer.appendChild(entryDomNode);
+    // clear scoreboard and insert 'waiting' banner
+    const container = domStartPageScoreBoardEntryContainer;
+    while (container.lastElementChild) {
+      container.removeChild(container.lastElementChild);
+    }
+    container.classList.add("loading");
+    container.textContent = "Rangliste wird geladen...";
+
+    this.game_service.getRankings((ranking) => {
+      if (this.state === kStateMain) {
+        container.classList.remove("loading");
+        container.textContent = undefined;
+
+        if (ranking.length === 0) {
+          container.textContent = "Keine Einträge vorhanden.";
+        } else {
+          // display the top 10 ranks
+          for (let i = 0; i < ranking.length && i < 10; i++) {
+            const entry = ranking[i];
+            const entryDomNode = createStartScoreboardEntryNode(entry);
+            container.appendChild(entryDomNode);
+          }
         }
       }
     });
@@ -338,7 +332,7 @@ class StonePaperScissorGame {
 }
 
 // wait for the document to be ready
-const game = new StonePaperScissorGame();
+const game = new StonePaperScissorGame(libGameService);
 document.addEventListener('DOMContentLoaded', () => {
   game.updateView();
 });

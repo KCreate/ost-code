@@ -16,9 +16,9 @@
     "import/extensions": "off",
     "object-curly-newline": "off",
     "object-curly-spacing": "off",
-    "@web-and-design/wed/no-while": "warn",
-    "@web-and-design/wed/use-action-map": "warn",
-    "@web-and-design/wed/check-html-gen": "warn"
+    "@web-and-design/wed/no-while": "off",
+    "@web-and-design/wed/use-action-map": "off",
+    "@web-and-design/wed/check-html-gen": "off"
   },
   "plugins": [
     "@web-and-design/eslint-plugin-wed"

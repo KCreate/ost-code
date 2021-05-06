@@ -3,6 +3,7 @@
     --main-win-color: #1da627ba;
     --main-tie-color: #56555acf;
     --main-lost-color: #f62929c2;
+    --main-light-bg-color: hsl(51deg 100% 98%);
 }
 
 * {
@@ -35,10 +36,10 @@ input:hover:enabled {
 }
 
 .big-button {
-    font-size: 15pt;
+    font-size: 14pt;
     padding: 20px 0;
     box-shadow: 0 4px 5px -6px rgb(0 0 0 / 40%);
-    background-color: hsl(51deg 100% 98%);
+    background-color: var(--main-light-bg-color);
     transition: 150ms ease-in-out;
 }
 
@@ -73,7 +74,7 @@ p {
 
 #startpage,
 #gamepage {
-    max-width: 600px;
+    max-width: 800px;
     margin: 0 auto;
     margin-top: 50px;
     padding: 10px;
@@ -81,6 +82,18 @@ p {
     border: 2px solid rgb(0 0 0 / 10%);
     border-radius: 5px;
     box-shadow: 0 4px 10px -6px rgb(0 0 0 / 40%);
+}
+
+#startpage-scoreboard-entry-container {
+  background-color: var(--main-light-bg-color);
+  border: 2px solid rgb(0 0 0 / 10%);
+  border-radius: 5px;
+  box-shadow: 0 4px 10px -6px rgb(0 0 0 / 40%);
+  text-align: center;
+
+  min-height: 100px;
+  margin: 20px auto;
+  padding: 10px 10px;
 }
 
 #startpage-form {
@@ -99,7 +112,7 @@ p {
 }
 
 #gamepage-choice-container button {
-    width: calc(100% / 3 - 3px);
+    width: calc(100% / 5);
     border-radius: 30px;
 }
 
@@ -153,12 +166,12 @@ p {
 }
 
 #gamepage-enemy-choice {
-    background-color: hsl(51deg 100% 98%);
+    background-color: var(--main-light-bg-color);
     box-shadow: 0 4px 5px -6px rgb(0 0 0 / 40%);
     font-size: 15pt;
     border-radius: 10px;
     text-align: center;
-    max-width: 100px;
+    max-width: 150px;
     margin: 0 auto;
     padding: 20px 0;
 }
