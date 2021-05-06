@@ -37,7 +37,7 @@ input:hover:enabled {
 
 .big-button {
     font-size: 14pt;
-    padding: 20px 0;
+    padding: 20px 20px;
     box-shadow: 0 4px 5px -6px rgb(0 0 0 / 40%);
     background-color: var(--main-light-bg-color);
     transition: 150ms ease-in-out;
@@ -84,16 +84,20 @@ p {
     box-shadow: 0 4px 10px -6px rgb(0 0 0 / 40%);
 }
 
-#startpage-scoreboard-entry-container {
-  background-color: var(--main-light-bg-color);
-  border: 2px solid rgb(0 0 0 / 10%);
-  border-radius: 5px;
-  box-shadow: 0 4px 10px -6px rgb(0 0 0 / 40%);
-  text-align: center;
+#startpage-mode-switch-button {
+    display: block;
+    margin: 20px auto;
+}
 
-  min-height: 100px;
-  margin: 20px auto;
-  padding: 10px 10px;
+#startpage-scoreboard-entry-container {
+    background-color: var(--main-light-bg-color);
+    border: 2px solid rgb(0 0 0 / 10%);
+    border-radius: 5px;
+    box-shadow: 0 4px 10px -6px rgb(0 0 0 / 40%);
+    text-align: center;
+    min-height: 100px;
+    margin: 20px auto;
+    padding: 10px 10px;
 }
 
 #startpage-form {

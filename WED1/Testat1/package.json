@@ -8,7 +8,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "stylelint": "stylelint \"**/*.css\"",
     "w3c": "html-validator --file ./schere-stein-papier.html  --verbose",
-    "eslint": "eslint scripts/** --fix",
+    "eslint": "eslint scripts/**",
     "all": "npm run stylelint && npm run w3c && npm run eslint && node -e \"console.log('npm run all completed')\""
   },
   "author": "Markus Stolze / Michael Gfeller",

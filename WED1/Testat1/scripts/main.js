@@ -1,8 +1,23 @@
 // game-service API
-const libGameService = await import('./game-service.js');
+import {
+  HANDS,
+  setConnected,
+  isConnected,
+  getRankings,
+  evaluateHand,
+} from './game-service.js';
+
+const libGameService = {
+  HANDS,
+  setConnected,
+  isConnected,
+  getRankings,
+  evaluateHand,
+};
 
 // register DOM nodes
 const domStartPage = document.getElementById('startpage');
+const domStartPageModeSwitchButton = document.getElementById('startpage-mode-switch-button');
 const domStartPageScoreBoardEntryContainer = document.getElementById('startpage-scoreboard-entry-container');
 const domStartPageForm = document.getElementById('startpage-form');
 const domStartPageFormName = document.getElementById('startpage-form-name');
@@ -92,20 +107,20 @@ function createGameScoreboardEntryNode(ranking) {
 }
 
 // builds the DOM structure for a specific user choice button
-function createUserChoiceButton(choice_name) {
+function createUserChoiceButton(name) {
   const node = document.createElement('button');
 
-  node.classList.add("big-button");
-  node.textContent = choice_name;
-  node.dataset.choiceName = choice_name;
+  node.classList.add('big-button');
+  node.textContent = name;
+  node.dataset.choiceName = name;
 
   return node;
 }
 
 // the StonePaperScissorGame class manages the game model and the UI update lifecycle
 class StonePaperScissorGame {
-  constructor(game_service) {
-    this.game_service = game_service;
+  constructor(gameService) {
+    this.gameService = gameService;
     this.state = kStateMain;
     this.username = null;
     this.choice_buttons = [];
@@ -115,6 +130,11 @@ class StonePaperScissorGame {
     this.game_history = [];
 
     this.selected_choice_dom_button = null;
+
+    // mode switch button
+    domStartPageModeSwitchButton.onclick = () => {
+      this.toggleMode();
+    };
 
     // start page username form submit
     domStartPageForm.onsubmit = () => {
@@ -128,16 +148,18 @@ class StonePaperScissorGame {
     };
 
     // inject user choice buttons into the user choice container div
-    for (let i = 0; i < this.game_service.HANDS.length; i++) {
-      const choice = this.game_service.HANDS[i];
-      const choice_button = createUserChoiceButton(choice);
-      this.choice_buttons.push(choice_button);
-      domGamePageChoiceContainer.appendChild(choice_button);
+    for (let i = 0; i < this.gameService.HANDS.length; i++) {
+      const choice = this.gameService.HANDS[i];
+      const choiceButton = createUserChoiceButton(choice);
+      this.choice_buttons.push(choiceButton);
+      domGamePageChoiceContainer.appendChild(choiceButton);
     }
 
     // listen for bubbling click events
     domGamePageChoiceContainer.onclick = (event) => {
-      this.chooseMove(event.target.dataset.choiceName);
+      if (event.target.nodeName === 'BUTTON') {
+        this.chooseMove(event.target.dataset.choiceName);
+      }
     };
 
     this.updateView();
@@ -175,7 +197,7 @@ class StonePaperScissorGame {
     this.state = kStateBattle;
     this.updateView();
 
-    this.game_service.evaluateHand(this.username, choice, (result) => {
+    this.gameService.evaluateHand(this.username, choice, (result) => {
       this.enemy_choice = result.systemHand;
       this.game_eval = result.gameEval;
       this.game_history.push(result);
@@ -195,6 +217,14 @@ class StonePaperScissorGame {
     });
   }
 
+  toggleMode() {
+    if (this.state === kStateMain) {
+      const isOnline = this.gameService.isConnected();
+      this.gameService.setConnected(!isOnline);
+      this.updateView();
+    }
+  }
+
   updateView() {
     // hide or show relevant game pages
     if (this.state === kStateMain) {
@@ -208,6 +238,13 @@ class StonePaperScissorGame {
     switch (this.state) {
       case kStateMain: {
         this.updateMainScoreboard();
+
+        // update mode toggle button message
+        if (this.gameService.isConnected()) {
+          domStartPageModeSwitchButton.textContent = 'Wechsel zur Offline-Version';
+        } else {
+          domStartPageModeSwitchButton.textContent = 'Wechsel zur Online-Version';
+        }
 
         domStartPageFormName.value = '';
 
@@ -235,7 +272,7 @@ class StonePaperScissorGame {
           const button = this.choice_buttons[i];
           button.disabled = true;
 
-          if (button.dataset.choiceName == this.user_choice) {
+          if (button.dataset.choiceName === this.user_choice) {
             button.classList.add('selected_by_user');
             this.selected_choice_dom_button = button;
           }
@@ -288,22 +325,21 @@ class StonePaperScissorGame {
   }
 
   updateMainScoreboard() {
-
     // clear scoreboard and insert 'waiting' banner
     const container = domStartPageScoreBoardEntryContainer;
     while (container.lastElementChild) {
       container.removeChild(container.lastElementChild);
     }
-    container.classList.add("loading");
-    container.textContent = "Rangliste wird geladen...";
+    container.classList.add('loading');
+    container.textContent = 'Rangliste wird geladen...';
 
-    this.game_service.getRankings((ranking) => {
+    this.gameService.getRankings((ranking) => {
       if (this.state === kStateMain) {
-        container.classList.remove("loading");
+        container.classList.remove('loading');
         container.textContent = undefined;
 
         if (ranking.length === 0) {
-          container.textContent = "Keine Einträge vorhanden.";
+          container.textContent = 'Keine Einträge vorhanden.';
         } else {
           // display the top 10 ranks
           for (let i = 0; i < ranking.length && i < 10; i++) {
@@ -332,7 +368,7 @@ class StonePaperScissorGame {
 }
 
 // wait for the document to be ready
-const game = new StonePaperScissorGame(libGameService);
 document.addEventListener('DOMContentLoaded', () => {
+  const game = new StonePaperScissorGame(libGameService);
   game.updateView();
 });

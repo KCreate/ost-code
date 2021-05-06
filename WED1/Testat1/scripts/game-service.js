@@ -1,20 +1,20 @@
-const DELAY_MS = 1000;
+const DELAY_MS = 750;
 
 const playerStats = {};
 
-function getRankingsFromPlayerStats() {
-  const playerNames = Object.keys(playerStats);
+function getRankingsFromPlayerStats(stats) {
+  const playerNames = Object.keys(stats);
 
   // compute the ranking
   let ranking = [];
   for (let i = 0; i < playerNames.length; i++) {
     const playerName = playerNames[i];
-    const stats = playerStats[playerName];
+    const playerInfo = stats[playerName];
 
-    if (ranking[stats.win] === undefined) {
-      ranking[stats.win] = { rank: null, wins: stats.win, players: [stats.name] };
+    if (ranking[playerInfo.win] === undefined) {
+      ranking[playerInfo.win] = { rank: null, wins: playerInfo.win, players: [playerInfo.user] };
     } else {
-      ranking[stats.win].players.push(stats.name);
+      ranking[playerInfo.win].players.push(playerInfo.user);
     }
   }
 
@@ -34,18 +34,32 @@ function getRankingsFromPlayerStats() {
 
 export const HANDS = ['Schere', 'Stein', 'Papier', 'Brunnen', 'Streichholz'];
 
-let isConnectedState = false;
+// read online state from local storage or initialize if not set
+
+const storedMode = localStorage.getItem('online_mode') === 'on';
+let isConnectedState = storedMode;
 
 export function setConnected(newIsConnected) {
   isConnectedState = Boolean(newIsConnected);
+  localStorage.setItem('online_mode', isConnectedState ? 'on' : 'off');
 }
 
 export function isConnected() {
   return isConnectedState;
 }
 
-export function getRankings(rankingsCallbackHandlerFn) {
-  const rankingsArray = getRankingsFromPlayerStats();
+export async function getRankings(rankingsCallbackHandlerFn) {
+  let stats;
+
+  if (isConnected()) {
+    // load ranking from the server
+    const response = await fetch('https://stone.dev.ifs.hsr.ch/ranking');
+    stats = await response.json();
+  } else {
+    stats = playerStats;
+  }
+
+  const rankingsArray = getRankingsFromPlayerStats(stats);
   setTimeout(() => rankingsCallbackHandlerFn(rankingsArray), DELAY_MS);
 }
 
@@ -94,11 +108,11 @@ function getGameEval(playerHand, systemHand) {
   return evalLookup[playerHand][systemHand];
 }
 
-function updateRanking(playerName, gameEval) {
+function updateLocalRanking(playerName, gameEval) {
   // initialite a record for the player
   if (playerStats[playerName] === undefined) {
     playerStats[playerName] = {
-      name: playerName,
+      user: playerName,
       win: 0,
       lost: 0,
     };
@@ -112,13 +126,28 @@ function updateRanking(playerName, gameEval) {
   }
 }
 
-export function evaluateHand(playerName, playerHand, gameRecordHandlerCallbackFn) {
-  const systemHand = HANDS[Math.floor(Math.random() * HANDS.length)];
-  const gameEval = getGameEval(playerHand, systemHand);
+export async function evaluateHand(playerName, playerHand, gameRecordHandlerCallbackFn) {
+  if (isConnected()) {
+    // send player move to API
+    const url = new URL('https://stone.dev.ifs.hsr.ch/play');
+    const params = {
+      playerName,
+      playerHand,
+    };
+    Object.keys(params).forEach((key) => url.searchParams.append(key, params[key]));
+    const response = await fetch(url);
+    const json = await response.json();
 
-  updateRanking(playerName, gameEval);
+    const systemHand = json.choice;
+    const gameEval = getGameEval(playerHand, systemHand);
 
-  setTimeout(() => gameRecordHandlerCallbackFn({ playerHand, systemHand, gameEval }), DELAY_MS);
+    setTimeout(() => gameRecordHandlerCallbackFn({ playerHand, systemHand, gameEval }), DELAY_MS);
+  } else {
+    const systemHand = HANDS[Math.floor(Math.random() * HANDS.length)];
+    const gameEval = getGameEval(playerHand, systemHand);
+    updateLocalRanking(playerName, gameEval);
+    setTimeout(() => gameRecordHandlerCallbackFn({ playerHand, systemHand, gameEval }), DELAY_MS);
+  }
 }
 
 // local functions
