@@ -5,6 +5,9 @@ import {
   isConnected,
   getRankings,
   evaluateHand,
+  RESULT_WIN,
+  RESULT_TIE,
+  RESULT_LOSE,
 } from './game-service.js';
 
 const libGameService = {
@@ -48,13 +51,20 @@ const domGamePageHistory = document.getElementById('gamepage-history');
 // │ Timeout ◄─────┤ Battle │ enemy is now choosing a move
 // └─────────┘     └────────┘
 //
-const kStateMain = 0;
-const kStateChooseMove = 1;
-const kStateBattle = 2;
-const kStateTimeout = 3;
+const stateMain = 0;
+const stateChooseMove = 1;
+const stateBattle = 2;
+const stateTimeout = 3;
 
 // ms to wait between turns
-const kGameDelay = 1500;
+const gameDelay = 1500;
+
+// german translations of gameService result states
+const resultGermanTranslation = {
+  [RESULT_WIN]: 'Gewonnen',
+  [RESULT_TIE]: 'Unentschieden',
+  [RESULT_LOSE]: 'Verloren',
+};
 
 // builds the DOM structure for a scoreboard entry
 function createStartScoreboardEntryNode(ranking) {
@@ -92,10 +102,7 @@ function createGameScoreboardEntryNode(ranking) {
 
   result.dataset.gameEval = ranking.gameEval;
 
-  // -1     -> win
-  //  0     -> tied
-  //  1     -> lose
-  result.textContent = ['Gewonnen', 'Unentschieden', 'Verloren'][ranking.gameEval + 1];
+  result.textContent = resultGermanTranslation[ranking.gameEval];
   userHand.textContent = ranking.playerHand;
   enemyHand.textContent = ranking.systemHand;
 
@@ -121,7 +128,7 @@ function createUserChoiceButton(name) {
 class StonePaperScissorGame {
   constructor(gameService) {
     this.gameService = gameService;
-    this.state = kStateMain;
+    this.state = stateMain;
     this.username = null;
     this.choice_buttons = [];
     this.user_choice = null;
@@ -166,35 +173,35 @@ class StonePaperScissorGame {
   }
 
   playGame(username) {
-    if (this.state !== kStateMain) {
+    if (this.state !== stateMain) {
       throw new Error('Invalider Spielzustand!');
     }
 
-    this.state = kStateChooseMove;
+    this.state = stateChooseMove;
     this.username = username;
     this.updateView();
   }
 
   exitGame() {
-    if (this.state !== kStateChooseMove) {
+    if (this.state !== stateChooseMove) {
       throw new Error('Invalider Spielzustand!');
     }
 
-    this.state = kStateMain;
+    this.state = stateMain;
     this.username = null;
     this.game_history = [];
     this.updateView();
   }
 
   chooseMove(choice) {
-    if (this.state !== kStateChooseMove) {
+    if (this.state !== stateChooseMove) {
       throw new Error('Invalider Spielzustand!');
     }
 
     this.user_choice = choice;
 
     // change into battle mode until the enemy has choosen his move
-    this.state = kStateBattle;
+    this.state = stateBattle;
     this.updateView();
 
     this.gameService.evaluateHand(this.username, choice, (result) => {
@@ -202,7 +209,7 @@ class StonePaperScissorGame {
       this.game_eval = result.gameEval;
       this.game_history.push(result);
 
-      this.state = kStateTimeout;
+      this.state = stateTimeout;
       this.updateView();
 
       setTimeout(() => {
@@ -211,14 +218,14 @@ class StonePaperScissorGame {
         this.game_eval = null;
         this.selected_choice_dom_button = null;
 
-        this.state = kStateChooseMove;
+        this.state = stateChooseMove;
         this.updateView();
-      }, kGameDelay);
+      }, gameDelay);
     });
   }
 
   toggleMode() {
-    if (this.state === kStateMain) {
+    if (this.state === stateMain) {
       const isOnline = this.gameService.isConnected();
       this.gameService.setConnected(!isOnline);
       this.updateView();
@@ -227,7 +234,7 @@ class StonePaperScissorGame {
 
   updateView() {
     // hide or show relevant game pages
-    if (this.state === kStateMain) {
+    if (this.state === stateMain) {
       domStartPage.classList.remove('element-hidden');
       domGamePage.classList.add('element-hidden');
     } else {
@@ -236,7 +243,7 @@ class StonePaperScissorGame {
     }
 
     switch (this.state) {
-      case kStateMain: {
+      case stateMain: {
         this.updateMainScoreboard();
 
         // update mode toggle button message
@@ -250,7 +257,7 @@ class StonePaperScissorGame {
 
         break;
       }
-      case kStateChooseMove: {
+      case stateChooseMove: {
         domGamePageBackButton.disabled = false;
 
         for (let i = 0; i < this.choice_buttons.length; i++) {
@@ -267,7 +274,7 @@ class StonePaperScissorGame {
         this.updateGameScoreboard();
         break;
       }
-      case kStateBattle: {
+      case stateBattle: {
         for (let i = 0; i < this.choice_buttons.length; i++) {
           const button = this.choice_buttons[i];
           button.disabled = true;
@@ -283,7 +290,7 @@ class StonePaperScissorGame {
         this.updateGameScoreboard();
         break;
       }
-      case kStateTimeout: {
+      case stateTimeout: {
         for (let i = 0; i < this.choice_buttons.length; i++) {
           const button = this.choice_buttons[i];
           button.disabled = true;
@@ -293,17 +300,17 @@ class StonePaperScissorGame {
         this.selected_choice_dom_button.classList.remove('selected_by_user');
 
         switch (this.game_eval) {
-          case -1: { // won
+          case RESULT_WIN: { // won
             this.selected_choice_dom_button.classList.add('winning_choice');
             domGamePageEnemyChoice.classList.add('lost_choice');
             break;
           }
-          case 0: { // tie
+          case RESULT_TIE: { // tie
             this.selected_choice_dom_button.classList.add('tie_choice');
             domGamePageEnemyChoice.classList.add('tie_choice');
             break;
           }
-          case 1: { // lost
+          case RESULT_LOSE: { // lost
             this.selected_choice_dom_button.classList.add('lost_choice');
             domGamePageEnemyChoice.classList.add('winning_choice');
             break;
@@ -334,7 +341,7 @@ class StonePaperScissorGame {
     container.textContent = 'Rangliste wird geladen...';
 
     this.gameService.getRankings((ranking) => {
-      if (this.state === kStateMain) {
+      if (this.state === stateMain) {
         container.classList.remove('loading');
         container.textContent = undefined;
 

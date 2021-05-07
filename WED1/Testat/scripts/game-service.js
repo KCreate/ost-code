@@ -63,44 +63,44 @@ export async function getRankings(rankingsCallbackHandlerFn) {
   setTimeout(() => rankingsCallbackHandlerFn(rankingsArray), DELAY_MS);
 }
 
-const resultWin = -1;
-const resultTie = 0;
-const resultLose = 1;
+export const RESULT_WIN = -1;
+export const RESULT_TIE = 0;
+export const RESULT_LOSE = 1;
 const evalLookup = {
   Schere: {
-    Schere: resultTie,
-    Stein: resultLose,
-    Papier: resultWin,
-    Brunnen: resultLose,
-    Streichholz: resultWin,
+    Schere: RESULT_TIE,
+    Stein: RESULT_LOSE,
+    Papier: RESULT_WIN,
+    Brunnen: RESULT_LOSE,
+    Streichholz: RESULT_WIN,
   },
   Stein: {
-    Schere: resultWin,
-    Stein: resultTie,
-    Papier: resultLose,
-    Brunnen: resultLose,
-    Streichholz: resultWin,
+    Schere: RESULT_WIN,
+    Stein: RESULT_TIE,
+    Papier: RESULT_LOSE,
+    Brunnen: RESULT_LOSE,
+    Streichholz: RESULT_WIN,
   },
   Papier: {
-    Schere: resultLose,
-    Stein: resultWin,
-    Papier: resultTie,
-    Brunnen: resultWin,
-    Streichholz: resultLose,
+    Schere: RESULT_LOSE,
+    Stein: RESULT_WIN,
+    Papier: RESULT_TIE,
+    Brunnen: RESULT_WIN,
+    Streichholz: RESULT_LOSE,
   },
   Brunnen: {
-    Schere: resultWin,
-    Stein: resultWin,
-    Papier: resultLose,
-    Brunnen: resultTie,
-    Streichholz: resultLose,
+    Schere: RESULT_WIN,
+    Stein: RESULT_WIN,
+    Papier: RESULT_LOSE,
+    Brunnen: RESULT_TIE,
+    Streichholz: RESULT_LOSE,
   },
   Streichholz: {
-    Schere: resultLose,
-    Stein: resultLose,
-    Papier: resultWin,
-    Brunnen: resultWin,
-    Streichholz: resultTie,
+    Schere: RESULT_LOSE,
+    Stein: RESULT_LOSE,
+    Papier: RESULT_WIN,
+    Brunnen: RESULT_WIN,
+    Streichholz: RESULT_TIE,
   },
 };
 
@@ -119,9 +119,9 @@ function updateLocalRanking(playerName, gameEval) {
   }
 
   // update scoreboard
-  if (gameEval === -1) {
+  if (gameEval === RESULT_WIN) {
     playerStats[playerName].win++;
-  } else if (gameEval === 1) {
+  } else if (gameEval === RESULT_LOSE) {
     playerStats[playerName].lost++;
   }
 }
