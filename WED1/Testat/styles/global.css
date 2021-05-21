@@ -3,7 +3,7 @@
     --main-win-color: #1da627ba;
     --main-tie-color: #56555acf;
     --main-lost-color: #f62929c2;
-    --main-light-bg-color: hsl(51deg 100% 98%);
+    --main-light-bg-color: hsl(51deg, 100%, 98%);
 }
 
 * {
@@ -25,7 +25,7 @@ h6 {
 
 button {
     background-color: white;
-    border: 2px solid rgb(0 0 0 / 10%);
+    border: 2px solid rgb(0, 0, 0, 0.1);
     border-radius: 5px;
     padding: 3px 7px;
 }
@@ -38,26 +38,26 @@ input:hover:enabled {
 .big-button {
     font-size: 14pt;
     padding: 20px 20px;
-    box-shadow: 0 4px 5px -6px rgb(0 0 0 / 40%);
+    box-shadow: 0 4px 5px -6px rgb(0, 0, 0, 0.4);
     background-color: var(--main-light-bg-color);
     transition: 150ms ease-in-out;
 }
 
 .big-button:hover:enabled {
-    box-shadow: 0 4px 10px -6px rgb(0 0 0 / 40%);
+    box-shadow: 0 4px 10px -6px rgb(0, 0, 0, 0.4);
     transform: translate(0, -2px);
     background-color: white;
 }
 
 input[type="text"] {
     background-color: white;
-    border: 2px solid rgb(0 0 0 / 10%);
+    border: 2px solid rgb(0, 0, 0, 0.1);
     border-radius: 5px;
     padding: 3px 7px;
 }
 
 hr {
-    border: 1px solid rgb(0 0 0 / 20%);
+    border: 1px solid rgb(0, 0, 0, 0.2);
 }
 
 p {
@@ -79,9 +79,9 @@ p {
     margin-top: 50px;
     padding: 10px;
     background-color: var(--main-accent-color);
-    border: 2px solid rgb(0 0 0 / 10%);
+    border: 2px solid rgb(0, 0, 0, 0.1);
     border-radius: 5px;
-    box-shadow: 0 4px 10px -6px rgb(0 0 0 / 40%);
+    box-shadow: 0 4px 10px -6px rgb(0, 0, 0, 0.4);
 }
 
 #startpage-mode-switch-button {
@@ -91,9 +91,9 @@ p {
 
 #startpage-scoreboard-entry-container {
     background-color: var(--main-light-bg-color);
-    border: 2px solid rgb(0 0 0 / 10%);
+    border: 2px solid rgb(0, 0, 0, 0.1);
     border-radius: 5px;
-    box-shadow: 0 4px 10px -6px rgb(0 0 0 / 40%);
+    box-shadow: 0 4px 10px -6px rgb(0, 0, 0, 0.4);
     text-align: center;
     min-height: 100px;
     margin: 20px auto;
@@ -171,7 +171,7 @@ p {
 
 #gamepage-enemy-choice {
     background-color: var(--main-light-bg-color);
-    box-shadow: 0 4px 5px -6px rgb(0 0 0 / 40%);
+    box-shadow: 0 4px 5px -6px rgb(0, 0, 0, 0.4);
     font-size: 15pt;
     border-radius: 10px;
     text-align: center;

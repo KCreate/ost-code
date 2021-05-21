@@ -109,7 +109,7 @@ function getGameEval(playerHand, systemHand) {
 }
 
 function updateLocalRanking(playerName, gameEval) {
-  // initialite a record for the player
+  // initialize a record for the player
   if (playerStats[playerName] === undefined) {
     playerStats[playerName] = {
       user: playerName,
@@ -149,5 +149,3 @@ export async function evaluateHand(playerName, playerHand, gameRecordHandlerCall
     setTimeout(() => gameRecordHandlerCallbackFn({ playerHand, systemHand, gameEval }), DELAY_MS);
   }
 }
-
-// local functions
